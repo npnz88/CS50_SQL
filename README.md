@@ -1,6 +1,6 @@
-###Read Me
+#### Read Me
 
-##CS50SQL - Introduction to Databases with SQL
+#### CS50SQL - Introduction to Databases with SQL
 
 ### Summary 
 
