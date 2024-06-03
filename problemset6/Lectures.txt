@@ -1,0 +1,109 @@
+This week is about bigger scale - what does it mean to have scalability?
+    - This is the ability to increase or decrease capacity to meet demand.
+    -
+
+MBTA
+    - Bostons subway's system.
+    - In week 1 we talked about representing the riders.
+    -
+mysql
+    - login as admin
+    - type -u then the name, in this case root which is the admin name.
+    - then the host -h 127.0.0.1
+    - once logged in, you can see the default database
+    - CREATE DATABASE
+    - USE 'name of database', nnow all queries are run on this db
+mysql types
+    - TINYINT SMALLINT MEDIUMINT INT BIGINT - 1 to 8 bytes in 2 increments.
+    - we can use an unassigned int which can go 1 or higher.
+    - CREATE TABLE 'table name' ('colunm name' INT AUTO_INCREMENT, PRIMARY KEY('id'))
+    - SHOW TABLES; to see tables
+    - DESCRIBE 'cards'; show schema of table
+    - CHAR - fixed width string, and only has or will ever have the same numebr of characters. I.e., country name like SNG or IND
+    - VARCHAR - Accepts a variable length string, and using this, MSQL will ask to provide how much space
+    - TEXT
+    - BLOB - bbinary
+    - ENUM; Constraints, i.e., we can only have t-shirt sizes, there are some fixed range of values for this column.
+    - SET; This complimennts ENUM, and we can only have 1 of these options. Like, set to this etc.
+    - Got to be extra safe, but the tradeoff is using bytes up to 300, that can be a waste. You can always come back and expand.
+    - DATE
+    - TIME (fsp) - we can specify how percisley do we keep track of time - Works with DATETIME, TIMESTAMP, and year.
+    - Real Numbers;
+    - Floating-Point Impercision, and if we have so many numerbs to represent, we can only represent some of them. Decimals are impercise.
+    - Use Decimal to contro how many decimal places we want.
+    - The type column is good for an ENUM, but what about date and time? We use date time. Amount column? We could use a DECIMAL, fixing percision. So amounts that go up 5 places, then 2 decimal places.
+    - VS code is a IDE, MYSQL and PostGress allows you to write statements on a CL, and you could connect them to create these queries.
+
+Store Procedures
+    - Define functions we will run over and over again. This is how we automate running a SQL statement to run over and over again.
+    - CREATE PROCEDURE name - a SP to see what is in our collection and not deleted.
+    - BEGIN ... END - use this after the CREATE PROC statement.
+    - ALTER TABLE 'collections' ADD COLUMN 'deleted'TINYINT DEFAULT 0 - only 1 or 0, so use as few bits as possible here
+    - We had to change the delimiter to // to ensure the CREATE PROC BEGIN..;.END; doesn't end our procedure prematurely.
+    - Create a table for the buying and selling of a art work. Now we wannt to updte a table, and then add this to another table. Thsi procedure can eb given one nname all together.
+    - CREATE PROCEDURE 'sell' () - Here use the ID of the an item in the collections table to mark it as sold. The create proc statement actually takes an input.
+    -
+    delimiter //
+    CREATE PROCEDURE 'sell'(IN 'sold_id' INT)
+        BEGIN
+        UPDATE 'collections' SET 'deleted' = 1
+        WHERE 'id' = 'sold_id';
+        INSERT INTO 'transactions' ('title', 'action')
+        VALUES((SELECT 'title' FROM 'collectionns' WHERE 'id' = 'sold_id'), 'sold');
+        END//
+    delimiter ;
+    - Now, choose the id of something you want to sell from the table. Put that value inthe PROC statement, i.e., CALL 'sell'(2)
+    - Remember you can multiple inputs to the procedure, if there are more than one checks that qualify the id as a sold item.
+    - You can use conditions like IF, ELSEIF, and ELSE if you want to repeate things over again. There is also REPEATE and WHILE.
+
+PostgreSQL
+    - Smallint int and bigint, fewer integer options. We can also use a new type called SERIAL, SMALLSERIAL, BIGSERIAL.
+    - SERIAL automatically increments for me, making it good for primary keys.
+    - The doubble quotes "" are back for identifiers.
+    - CREATE TABLE "cards" ( "id" SERIAL, PRIMARY KEY ("id"))
+    - psql postgressql://IP and PORT
+    - ENUM
+    - TIMESTAMP, TIME, DATE, INTERVAL (P), for percision
+    - MONEY, NUMERIC(percision, scale)
+Vertical Scaling
+    - The time that each query takes, we can time our queries, that can add up substantially.
+    - If something performs slowly at scale, what might we try to do to solve that problem? Optomize query, but that is already maxed. Another approach is a vertical scale.
+
+Horizontal Scalinng
+    - Single-learder: this takes in the incoming writes to a database. This data is stored not just in one place but multiple places. It gets a lot more complicated when trying to listenn to udpates
+    - Leaderless: no leaders.
+    - focus on single leader, and this is built into mysql.
+    - Connect to a db. Leader and Follower db's. We update data in leader, and then the leader will store a copy of the location of that data in the server itself .
+    - If we asked the follower for the data, we can get back this image from our browser. This follower is what is known as a read replcia.
+    - Read replica: A copy of a databbase from which data may only be read.
+    - Synchronous: The leader waits for the follower to get the data and process it. This is slower. This is key for finance and healthcare.
+    - Asynchronous: The leader doesn't wait for the follower to process the data. This is faster. This is for social media.
+
+Sharding
+    - Good for large datasets, GB or TB, stuff that doesnt fit in one server or computer. Split up the data, into shards.
+    - If we don't replicate, and only shard, then we could have a single point of failure.
+
+Access Control
+    - mysql
+    - GRANT privilege, ... TO user;
+    - REVOKE privilege, ... FROM user;
+    - If you want to give someone multiple privileges, you can use ALL *.* to Carter
+    - Best to be more fine grained.
+
+SQL Injection Attacks
+    - There is a select statemennt, and then this is injected with an OR statement with 1 = 1, thsi will make the previosu AND and WHERE statement invalid.
+    - THere are also UNIONS, where you can add a selct satement to select from other tables.
+    - These are fairly common today
+
+Prepared statement
+    - We will insert some values into here
+    - PREPARE name FROM statement;
+    - We can use this to make sure when we add into user input, nothing malicous happens.
+    - PREPARE SELECT 'balance' FROM 'accounts' WHERE 'id' = ?;
+    - SET @id = 1; The user input is seperate to anny other variable.
+    - Execute 'balance_check' USING @id; this will clean the statement
+    -
+
+
+
+

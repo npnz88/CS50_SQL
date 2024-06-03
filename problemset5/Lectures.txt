@@ -1,0 +1,97 @@
+
+Performance
+    - This lecture uses imdb data.
+    - .timer on, we can time our future queries.
+    - we can query again and get the run time:
+    - This is where user and system time come in
+    - User time is how long this took on the CPU, and then the system time is the operating sustem time
+    - Real time is time we are concerned about.
+    - What is the concern about a query that takes 0/8 seconds. The database may be overwhelmed by the query.
+    - Many users running the queries all at once.
+
+A scan of the table - Algorithm
+    - scan top to bottom, and we go one by one.
+    - Index: a structre we can use to speed up the retrieval of rows from a table. We use the index, then serach the rows for it.
+    - CREATE INDEX name - store information about a table we want to search in our query
+    - i.e., like a book, index by author or page.
+    - CREATE INDEX name
+        on table (column0,...)
+    -  CREATE INDEX "title_index" ON "movies" --the table ("title") --the column;
+    - SELECT * FROM "movies" WHERE "title" = 'Cars';
+    - We see that the query run time dropped from 0.08 to 0.001
+
+EXPLAIN QUERY PLAN
+    - how will SQL execute this query
+    - select * from "movies" where "title" = "cars";
+    - QUERY PLAN
+    - Index can speed up the qeyr, but also speed up queries across tables
+    - SELECT "title" FROM "movies" - nothing related to Tom Hanks. there is probably something related to the stars table
+    - Before index, explain query plan. We put in the query we wish to use. Then we can see how the system is seraching.
+    - based on this, we find index columns.
+    - in class, Carter creates 2 indexes for the nested query he has on finding movies tom hanks was in.
+    - Now we EXPLIN THE WUERY PLAN again, and we will be able to see SEARCH instead of TABLE LOOK UP, which is faster.
+    - New word, COVERING INDEX - this is when we have a anindex in which queried data can be retrieved from the index itself. It stores the data like a dicitonary.
+
+COVERING INDEX
+    - We can create the new index that can cover our search here.
+    - The movie id column we can also find ourselves.
+    - CREATE INDEX "person_index" ON "starts" (column0, column1)
+    - EXPLAIN Q PLAN, to see if we have the COVERING INDEX (i.e., store all the information we need in INDEX rather than using table look-up)
+    - This query is a lot faster now. It dropped to 0.004 seconds in real time.
+
+What is the cost of the COVERING INDEX?
+    - We are now giving up memory.
+
+B-Tree
+    - A balanced tree structure commonly used to create an index
+    - A tree looks like it has a trunk and then spans out.
+    - Parent node - Child node - leaf node (i.e., no other index)
+    - We can break data down into nodes, and the system (sqlite) splits our data into nodes. These are used when a index is created with an algorithm.
+    - In class we reference the list split into nodes
+
+Partial Index - optomize some of the space that these queries take up
+    - Only includes a subset of the data from a given column
+    - We knwo that users will only query froma smaller number of rows. We know that, for example, people are more likely to serach for more recent movies.
+    - So we create an index, and include some data from a table, BUT then, we add a condition, where we only include certain rows when this condition is met in our index.
+    - Remembering that an index will store the values of give table and column.
+
+VACUM
+    - Clean up unused space in our database. When we delete something, we don't actaully delete those bits, we just mark them as something that can be overwritten
+    - We should use something like VACUUM in SQLite so we can give them back to the operating system.
+    - du -b movies.db --tells us how many bytes we have used
+    - lets try dropping and index and see what happens to the bytes. Its the same size...
+    - lets drop something else - still the same...
+    - BUT remember, we are just marking those parts of the index as ready for use... we need to VACUUM
+
+Concurrency
+    - multiple queries at once
+
+Transaction
+    - A unit of work in a database. It happens all at once of not at all.
+    - There are properties to a transaction.
+    - These are
+        - Atomicity: I can;t break a transaction down to one thing,it is obth at once.
+        - Consistency: A transaction will undo if there is not enough to make the transaction.
+        - Isoltion: transactions don't interfer with each other
+        - Durability: all that data is there at the time we committed the data.
+    - BEGIN TRANSACTION
+    ...
+    COMMIT;
+    - This will ensure that no one sees incorrect balances.
+    - Start with BEGIN TRAN... but remembebr nothing happens until you commit
+    Transactionns we can't complete, i.e., if the balance is lower than $0 but the transaction is expected.
+    BEGIN TRANSACTION;
+    ...
+    ROLL BACK
+    - UPDATE TRANSCATION that does not work due to a check constraint, we just have the ROLLBACK
+    RACE CONDITION
+    - Multiple processes and people trying to access a value.
+    - Hackers can exploit race conditions to a way that benefits them.
+        i.e., Alice and Bob activate 3 transactions, and Charlie has $30 and transfers to Alice.
+    - We need to ensure that people cannot access data that they are not able to.
+    - Each one has a different meaning for their processess. Lets say two accounts access a db, at onces, this is unlocked.
+    - Lets say we have soneone who wants to read from a database, and then that person will get a share. Thsi allows others to read.
+    - You are only reading, and you too could read as well. They could acquire the same shared lock. Multiple transactions can read at once.
+    - If you need to update the data.
+
+

@@ -1,0 +1,32 @@
+
+-- *** The Lost Letter ***
+--Find Anneke's address ID
+--SELECT id
+--FROM addresses
+--WHERE address = '900 Somerville Avenue';
+--id = 432
+--Find all packages that left Anneke's house
+-- SELECT p.id as package_id, p.contents, a.address as from_address, a2.address as to_address
+  -- ...> FROM packages p
+   --...> JOIN addresses a ON p.from_address_id = a.id
+   --...> JOIN addresses a2 ON p.to_address_id = a2.id
+   --...> WHERE a.address = '900 Somerville Avenue';
+-- This returned the package id of 384 which is the congratulatory letter
+-- use this to then find out what packages where delivered and what address they reached to from Anneke's place
+--SELECT * FROM scans WHERE package_id = (
+--   ...>     SELECT id FROM packages
+--   ...>     WHERE from_address_id IS NULL
+--   ...> ) AND action = 'Drop';
+-- *** The Devious Delivery ***
+--We selected the NULL from aaddresss value that is 50
+--SELECT id FROM packages WHERE from_address_id IS NULL
+-- SELECT id FROM packages WHERE from_address_id IS NULL
+-- *** The Forgotten Gift ***
+--Find the address id
+-- Then figure out where they live in the addresses table
+-- Then find all the packages from the address id from 9873 (using brakcets)
+-- Now we know that the content is flowers
+-- SELECT id FROM packages
+-- WHERE from_address_id = (SELECT id FROM addressses WHERE from_address_id =(
+--  SELECT id FROM addresses WHERE address = '109 Tileston Street')
+--));

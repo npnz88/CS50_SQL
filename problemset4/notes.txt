@@ -1,0 +1,49 @@
+Simplfying data
+aggregating data
+partitioning data
+securing data
+
+All of this can be done with views
+
+1. Simplify:
+- Temp views will be lost when you .quit from sqlite3
+
+2. Aggregate
+- CTE: WITH name AS ( SELECT ....), .... SELECT ... FROM name;
+    - The CTE is good when you only want a view for the duration of the query
+    - In the class, DROP VIEW "average_book_ratings":
+    - Then query to creat the ratings table, and then close the bracket with the CTE, and then write the query for the yearly ratings avg, right after the last one, which is the CTE.
+
+3. Partitioning
+    - Create a table for books nominated in 2022, and then this is a view.
+    - Recreate the view by partitioning the values by another view and make another view.
+    - Partition as you analyse to make the overall task easier
+
+4. Secure
+    - With a view, we can keep the underlying table,a dn only have the origin and destination that omits the riders (we have a table with riders and their destiantions and departure locations)
+    - Don't select the rider column, and then we create this as a view.
+    - Imporve this enve more, and we can fill that column with an arbitraty value. In this case, use 'Anoymous' AS "rider"
+    - This is not that secure in SQLITE3. We can't set access controls. We COULD in other ones.
+
+Soft Deletion
+    - Keep track of items in 'colletions' table, with id, title, deleted. We want to delete, and we could set the value in the column from 0 or 1.
+    - WHat can we do to only see now.
+    - add a deleted column set to 0
+    - UPDATE "collections" SET "deleted" = 1 WHERE "title = 'Farmers working at dawn'; So we have marked this as being soft deleted.
+    - in our view, we apply the WHERE condition WHERE "deleted" = 0;
+    - BUT if we want to update this view, waht can we do? We can only change the underlying table, so to avoid actually hard deleting, we create a trigger
+    - CREATE TRIGGER name INSTEAD OF DELETE ON view FOR EACH ROW BEGIN ...; END;
+        - BEGIN UPDATE "collections" SET "deleted" = 1 WHERE "id" = OLD."id"
+    - The other case of if we need to add a value back to the table, we can set an update for when we insert into the main table, trigger an update on the delete column to be 0, OR we insert a new value to the table
+    - CREATE TRIGGER "insert_when_exists"
+        INSTRED OF INSERT ON "current_collections"
+        FOR EACH ROW
+        WHEN NEW."accession_number" IN (
+            SELECT "accession_number" FROM "collections"
+        )
+        BEGIN
+            UPDATE "collections" SET "deleted" = 0
+            WHERE "accession_number" = NEW."accession_number"
+            END;
+    - We can create a trigger to update the column and the rows as well
+    
