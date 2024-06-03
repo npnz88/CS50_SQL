@@ -4,7 +4,7 @@
 
 ### Summary 
 
-Within this repository is the submitted lab work and final project, (listed under the `project` folder above). 
+Within this repository is the submitted lab work and final project, (listed under the `project` folder above), for CS50 SQL. 
 The following sections provides an overview of key concepts learned and practied with each problem set (0 to 6). 
 
 #### Week 0
